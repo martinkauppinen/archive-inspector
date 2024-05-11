@@ -26,6 +26,10 @@
       {
         "command": "archive-inspector.mount.tar",
         "title": "Mount archive"
+      },
+      {
+        "command": "archive-inspector.mount.zip",
+        "title": "Mount archive"
       }
     ],
     "menus": {
@@ -33,6 +37,10 @@
         {
           "when": "resourceFilename =~ /.*\\.(tar(\\.(gz|Z|lz|lzma|lzo|zst|xz|bz2))|tgz|taz|taZ|tz2|tbz2|tlz|tzst)?$/",
           "command": "archive-inspector.mount.tar"
+        },
+        {
+          "when": "resourceFilename =~ /.*\\.zip$/",
+          "command": "archive-inspector.mount.zip"
         }
       ]
     },
@@ -70,5 +78,9 @@
     "@vscode/test-electron": "^2.3.9",
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@types/unzipper": "^0.10.9",
+    "unzipper": "^0.11.6"
   }
 }

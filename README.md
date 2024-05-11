@@ -23,6 +23,7 @@ This is an extension for VsCode which allows you to mount archive files as works
   * `.tbz2`
   * `.tlz`
   * `.tzst`
+* `.zip`
 
 ## Requirements
 

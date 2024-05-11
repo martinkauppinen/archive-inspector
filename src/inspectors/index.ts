@@ -7,3 +7,4 @@ export interface ArchiveInspector {
 }
 
 export * from './tar';
+export * from './zip';

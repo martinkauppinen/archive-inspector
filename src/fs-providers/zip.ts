@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { TarInspector } from '../inspectors';
+import { ZipInspector } from '../inspectors';
 import { AbstractFsProvider } from '.';
 
-export class TarFsProvider extends AbstractFsProvider<TarInspector> {
-    protected inspector: TarInspector = new TarInspector();
-    public static readonly scheme = this.buildScheme('tarfs');
-    public static readonly mountCommand = this.buildMountCommand('tar');
+export class ZipFsProvider extends AbstractFsProvider<ZipInspector> {
+    protected inspector: ZipInspector = new ZipInspector();
+    public static readonly scheme = this.buildScheme('zipfs');
+    public static readonly mountCommand = this.buildMountCommand('zip');
 
     public static register(context: vscode.ExtensionContext): void {
-        context.subscriptions.push(vscode.workspace.registerFileSystemProvider(this.scheme, new TarFsProvider(), {
+        context.subscriptions.push(vscode.workspace.registerFileSystemProvider(this.scheme, new ZipFsProvider(), {
             isReadonly: true,
             isCaseSensitive: true
         }));

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ArchiveInspector, TarInspector } from '../inspectors';
+import { ArchiveInspector } from '../inspectors';
 import * as log from '../log';
 import * as constants from '../constants';
 
@@ -47,6 +47,20 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
         throw new Error('Method not implemented - copy.');
     }
 
+    protected static mountArchive(archive: vscode.Uri | undefined) {
+        if (archive === undefined ) {
+            return;
+        }
+
+        const uri = vscode.Uri.parse(`${this.scheme}:?${archive.fsPath}`);
+        if (vscode.workspace.getWorkspaceFolder(uri) === undefined) {
+            const name = vscode.workspace.asRelativePath(archive.fsPath, true);
+            const index = vscode.workspace.workspaceFolders?.length ?? 0;
+            const wpFolder: vscode.WorkspaceFolder = { uri, name, index };
+            vscode.workspace.updateWorkspaceFolders(index, 0, wpFolder);
+        }
+    }
+
     protected static buildScheme(scheme: string): string {
         return `${constants.extensionName}-${scheme}`;
     }
@@ -57,3 +71,4 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
 }
 
 export * from './tar';
+export * from './zip';

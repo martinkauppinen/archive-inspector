@@ -37,7 +37,7 @@
       ]
     },
     "configuration": {
-      "title": "WIP",
+      "title": "Archive Inspector",
       "properties": {
         "archive-inspector.pathToTar": {
           "type": "string",

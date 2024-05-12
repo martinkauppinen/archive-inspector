@@ -45,3 +45,7 @@ This extension contributes the following settings:
 ### 0.1.0
 
 Initial preview release. Supports the `.tar` format, with or without compression.
+
+### 0.2.0
+
+Add support for `.zip`

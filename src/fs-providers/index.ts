@@ -31,29 +31,29 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
         return this.inspector.readFile(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
     }
 
-    public watch(uri: vscode.Uri, options: { readonly recursive: boolean; readonly excludes: readonly string[]; }): vscode.Disposable {
-        return { dispose: () => {} };
+    public watch(_uri: vscode.Uri, _options: { readonly recursive: boolean; readonly excludes: readonly string[]; }): vscode.Disposable {
+        return { dispose: () => { } };
     }
 
     // Methods below only throw, because the file system is read-only, so they will never be called anyway.
-    public createDirectory(uri: vscode.Uri): void | Thenable<void> {
+    public createDirectory(_uri: vscode.Uri): void | Thenable<void> {
         throw new Error('Method not implemented - createDirectory.');
     }
-    public writeFile(uri: vscode.Uri, content: Uint8Array, options: { readonly create: boolean; readonly overwrite: boolean; }): void | Thenable<void> {
+    public writeFile(_uri: vscode.Uri, _content: Uint8Array, _options: { readonly create: boolean; readonly overwrite: boolean; }): void | Thenable<void> {
         throw new Error('Method not implemented - writeFile.');
     }
-    public delete(uri: vscode.Uri, options: { readonly recursive: boolean; }): void | Thenable<void> {
+    public delete(_uri: vscode.Uri, _options: { readonly recursive: boolean; }): void | Thenable<void> {
         throw new Error('Method not implemented - delete.');
     }
-    public rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { readonly overwrite: boolean; }): void | Thenable<void> {
+    public rename(_oldUri: vscode.Uri, _newUri: vscode.Uri, _options: { readonly overwrite: boolean; }): void | Thenable<void> {
         throw new Error('Method not implemented - rename.');
     }
-    public copy?(source: vscode.Uri, destination: vscode.Uri, options: { readonly overwrite: boolean; }): void | Thenable<void> {
+    public copy?(_source: vscode.Uri, _destination: vscode.Uri, _options: { readonly overwrite: boolean; }): void | Thenable<void> {
         throw new Error('Method not implemented - copy.');
     }
 
     protected static mountArchive(archive: vscode.Uri | undefined) {
-        if (archive === undefined ) {
+        if (archive === undefined) {
             return;
         }
 
@@ -79,7 +79,7 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
                     canSelectFolders: false,
                     canSelectMany: false,
                     openLabel: 'Mount'
-                }).then(selection => this.mountArchive(selection?.at(0)));
+                }).then((selection) => this.mountArchive(selection?.at(0)));
             } else {
                 this.mountArchive(uri);
             }

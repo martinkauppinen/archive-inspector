@@ -69,6 +69,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^2.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.89.0",

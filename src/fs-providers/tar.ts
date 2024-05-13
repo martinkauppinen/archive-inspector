@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import { TarInspector } from '../inspectors';
 import { AbstractFsProvider } from '.';
 

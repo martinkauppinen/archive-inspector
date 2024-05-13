@@ -14,8 +14,8 @@ export class TarInspector extends AbstractInspector {
 
         const lines = result
             .split(/\n/)
-            .filter(line => line.length > 0)
-            .filter(line => line.startsWith('-') || line.startsWith('d'));
+            .filter((line) => line.length > 0)
+            .filter((line) => line.startsWith('-') || line.startsWith('d'));
 
         for (const line of lines) {
             const type = line.startsWith('-') ? vscode.FileType.File : vscode.FileType.Directory;
@@ -33,7 +33,7 @@ export class TarInspector extends AbstractInspector {
 
     protected getArchiveListing(archive: vscode.Uri): string[] | Promise<string[]> {
         const result = execSync(`${tar()} --list --auto-compress --file=${archive.fsPath}`, { encoding: 'utf-8' });
-        return result.split('\n').filter(line => line.length > 0);
+        return result.split('\n').filter((line) => line.length > 0);
     }
 
     public async readFile(archive: vscode.Uri, uri: vscode.Uri): Promise<Uint8Array> {
@@ -43,7 +43,7 @@ export class TarInspector extends AbstractInspector {
 }
 
 function tar(): string {
-    return vscode.workspace.getConfiguration(constants.extensionName).get<string>('pathToTar') ?? "tar";
+    return vscode.workspace.getConfiguration(constants.extensionName).get<string>('pathToTar') ?? 'tar';
 }
 
 function maxBuffer(): number {

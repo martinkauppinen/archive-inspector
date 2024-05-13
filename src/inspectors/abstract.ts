@@ -10,7 +10,7 @@ export abstract class AbstractInspector implements ArchiveInspector {
 
     /**
      * This method's implementation shall open the archive, stat each file in the archive, and cache the results.
-     * 
+     *
      * @param archive The archive.
      * @param ctime The time of creation. Used because vscode.FileStat needs it. This will be the creation time of the archive.
      * @param uri The URI of the file VsCode has requested to stat.
@@ -26,7 +26,7 @@ export abstract class AbstractInspector implements ArchiveInspector {
 
     /**
      * Reads a file from an archive.
-     * 
+     *
      * @param archive The archive.
      * @param uri The file in the archive that should be read.
      */
@@ -92,12 +92,12 @@ export abstract class AbstractInspector implements ArchiveInspector {
         log.debug(`Populating directory cache: ${archive.path}`);
 
         const listing = await this.getArchiveListing(archive);
-        const directories = new Set(listing.flatMap(line => {
+        const directories = new Set(listing.flatMap((line) => {
             const components = line.split('/');
             const isFile = (components.length === 1 || components[components.length - 1] !== '');
             return components
                 .slice(0, components.length - (isFile ? 1 : 0))
-                .filter(part => part.length > 0)
+                .filter((part) => part.length > 0)
                 .map((value, index, array) => {
                     if (index === 0) {
                         return value;
@@ -106,10 +106,10 @@ export abstract class AbstractInspector implements ArchiveInspector {
                     return array.slice(0, index).join('/') + '/' + value;
                 });
         }));
-        const files = listing.filter(line => !line.endsWith('/'));
-        const topLevelFiles = files.filter(line => line.split('/').length === 1);
+        const files = listing.filter((line) => !line.endsWith('/'));
+        const topLevelFiles = files.filter((line) => line.split('/').length === 1);
 
-        directories.forEach(directory => {
+        directories.forEach((directory) => {
             if (directory.indexOf('/') === -1) {
                 const rootCache = this.directoryCache.get('/') ?? [];
                 rootCache.push([directory, vscode.FileType.Directory]);
@@ -117,8 +117,8 @@ export abstract class AbstractInspector implements ArchiveInspector {
             }
 
             const contents: [string, vscode.FileType][] = [...directories].concat([...files])
-                .filter(line => line.startsWith(directory + '/') && line !== directory)
-                .filter(line => {
+                .filter((line) => line.startsWith(directory + '/') && line !== directory)
+                .filter((line) => {
                     const subPath = line.slice(directory.length + 1);
                     const subComponents = subPath.split('/');
 
@@ -134,7 +134,7 @@ export abstract class AbstractInspector implements ArchiveInspector {
 
                     return false;
                 })
-                .map(line => {
+                .map((line) => {
                     if (directories.has(line.replace(/\/$/, ''))) {
                         return [line.slice(directory.length + 1).replace('/', ''), vscode.FileType.Directory];
                     } else {
@@ -144,7 +144,7 @@ export abstract class AbstractInspector implements ArchiveInspector {
             this.directoryCache.set('/' + directory, contents);
         });
 
-        topLevelFiles.forEach(file => {
+        topLevelFiles.forEach((file) => {
             const rootCache = this.directoryCache.get('/') ?? [];
             rootCache.push([file, vscode.FileType.File]);
             this.directoryCache.set('/', rootCache);

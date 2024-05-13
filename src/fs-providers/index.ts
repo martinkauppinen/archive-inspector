@@ -11,7 +11,9 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
     /**
      * Should simply be set to return a new instance of the derived class.
      */
-    protected static readonly constructorWrapper: () => any; // Would prefer to use a good return type, but `any` will do for now.
+    protected static readonly constructorWrapper: () => AbstractFsProvider<any>; // Would prefer to use a good return type, but `any` will do for now.
+
+    protected abstract extractNested(archive: vscode.Uri, nested: vscode.Uri): vscode.Uri | Thenable<vscode.Uri>;
 
     protected _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     public onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
@@ -57,11 +59,29 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
             return;
         }
 
+        // TODO: figure out if this can be achieved directly in the tree of the mounted archive,
+        // making nested archives completely transparent. Will most likely have to sacrifice performance to achieve.
+        if (archive.scheme.startsWith(constants.extensionName)) {
+            vscode.commands.executeCommand<vscode.Uri | Thenable<vscode.Uri>>(this.extractionCommand(archive.scheme), vscode.Uri.file(archive.query), vscode.Uri.file(archive.fsPath))
+                .then(async (extractedUri) => {
+                    try {
+                        const extractedUri2 = await extractedUri;
+                        vscode.window.showInformationMessage(`Nested archive extracted to ${extractedUri2.fsPath}`);
+                        this.mountArchive(extractedUri2);
+                    } catch (e) {
+                        vscode.window.showErrorMessage(`Failed to extract nested archive.`);
+                        log.error(e);
+                    }
+                });
+            return;
+        }
+
         const uri = vscode.Uri.parse(`${this.scheme}:?${archive.fsPath}`);
         if (vscode.workspace.getWorkspaceFolder(uri) === undefined) {
             const name = vscode.workspace.asRelativePath(archive.fsPath, true);
             const index = vscode.workspace.workspaceFolders?.length ?? 0;
             const wpFolder: vscode.WorkspaceFolder = { uri, name, index };
+            WorkspaceFolderStore.getInstance().insert(wpFolder);
             vscode.workspace.updateWorkspaceFolders(index, 0, wpFolder);
         }
     }
@@ -84,6 +104,10 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
                 this.mountArchive(uri);
             }
         }));
+
+        context.subscriptions.push(vscode.commands.registerCommand(`${this.extractionCommand(this.scheme)}`, (archive: vscode.Uri, nested: vscode.Uri): vscode.Uri | Thenable<vscode.Uri> => {
+            return this.constructorWrapper().extractNested(archive, nested);
+        }));
     }
 
     protected static buildScheme(scheme: string): string {
@@ -92,6 +116,34 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
 
     protected static buildMountCommand(filetype: string): string {
         return `${constants.extensionName}.mount.${filetype}`;
+    }
+
+    private static extractionCommand(scheme: string): string {
+        return `${constants.extensionName}.extract.${scheme}`;
+    }
+}
+
+export class WorkspaceFolderStore {
+    private static instance: WorkspaceFolderStore;
+    private workspaceFolders: vscode.WorkspaceFolder[] = [];
+
+    private constructor() { }
+
+    public static getInstance(): WorkspaceFolderStore {
+        if (!WorkspaceFolderStore.instance) {
+            WorkspaceFolderStore.instance = new WorkspaceFolderStore();
+        }
+        return WorkspaceFolderStore.instance;
+    }
+
+    public insert(folder: vscode.WorkspaceFolder): void {
+        this.workspaceFolders.push(folder);
+    }
+
+    public clean(): void {
+        this.workspaceFolders.forEach((folder) => {
+            vscode.workspace.updateWorkspaceFolders(folder.index, 1);
+        });
     }
 }
 

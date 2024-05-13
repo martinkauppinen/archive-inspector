@@ -4,6 +4,7 @@ import * as util from 'util';
 import * as log from '../log';
 import * as constants from '../constants';
 import { AbstractInspector } from './abstract';
+import { tar } from '../util';
 
 const execPromise = util.promisify(exec);
 
@@ -40,10 +41,6 @@ export class TarInspector extends AbstractInspector {
         const result = await execPromise(`${tar()} --extract --to-stdout --auto-compress --file=${archive.fsPath} ${uri.path.slice(1)}`, { maxBuffer: maxBuffer() });
         return Buffer.from(result.stdout);
     }
-}
-
-function tar(): string {
-    return vscode.workspace.getConfiguration(constants.extensionName).get<string>('pathToTar') ?? 'tar';
 }
 
 function maxBuffer(): number {

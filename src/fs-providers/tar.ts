@@ -3,6 +3,7 @@ import * as constants from '../constants';
 import { TarInspector } from '../inspectors';
 import { AbstractFsProvider } from '.';
 import { execSync } from 'child_process';
+import { makeTempDir, tar } from '../util';
 
 export class TarFsProvider extends AbstractFsProvider<TarInspector> {
     protected inspector: TarInspector = new TarInspector();
@@ -10,6 +11,12 @@ export class TarFsProvider extends AbstractFsProvider<TarInspector> {
     public static readonly scheme = this.buildScheme('tarfs');
     public static readonly mountCommand = this.buildMountCommand('tar');
     private hasGnuTar: boolean = false;
+
+    protected extractNested(archive: vscode.Uri, nested: vscode.Uri): vscode.Uri {
+        const outputUri = vscode.Uri.file(makeTempDir());
+        execSync(`${tar()} --extract --auto-compress --file=${archive.path} -C ${outputUri.fsPath} ${nested.path.slice(1)}`);
+        return vscode.Uri.joinPath(outputUri, nested.path.slice(1));
+    }
 
     public override stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
         this.assertGnuTar();
@@ -65,10 +72,8 @@ function checkGnuTar(): boolean {
             });
     };
 
-    const tar = vscode.workspace.getConfiguration(constants.extensionName).get<string>('pathToTar') ?? 'tar';
-
     try {
-        const isGnuTar = execSync(`${tar} --version`, { encoding: 'utf-8' }).includes('GNU tar');
+        const isGnuTar = execSync(`${tar()} --version`, { encoding: 'utf-8' }).includes('GNU tar');
         if (!isGnuTar) {
             showWarningMessage();
         }

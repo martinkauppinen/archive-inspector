@@ -1,6 +1,7 @@
 {
   "name": "archive-inspector",
   "displayName": "Archive Inspector",
+  "publisher": "martinkauppinen",
   "description": "Mount archive files as workspace directories",
   "version": "0.3.0",
   "engines": {

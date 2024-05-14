@@ -4,9 +4,13 @@ All notable changes to the "archive-inspector" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.3.0]
 
+### Added
 - Support nested archives via extraction to temporary file.
+
+### Fixed
+- Opening multiple archives of the same type no longer only makes one of their file trees visible.
 
 ## [0.2.0]
 

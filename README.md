@@ -49,3 +49,7 @@ Initial preview release. Supports the `.tar` format, with or without compression
 ### 0.2.0
 
 Add support for `.zip`
+
+### 0.3.0
+
+Support nested archives via temporary files.

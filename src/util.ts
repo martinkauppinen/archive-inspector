@@ -16,7 +16,11 @@ export function cleanTempDir() {
     const tmpDir = os.tmpdir();
     const userInfo = os.userInfo();
     const prefix = tmpDir + path.sep + constants.extensionName + path.sep + userInfo.username + path.sep;
-    fs.rmdirSync(prefix, { recursive: true });
+    try {
+        fs.rmSync(prefix, { recursive: true });
+    } catch (e) {
+        // No-op. It's fine if the directory doesn't exist.
+    }
 }
 
 export function tar(): string {

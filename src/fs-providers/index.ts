@@ -6,12 +6,13 @@ import * as constants from '../constants';
 export abstract class AbstractFsProvider<T extends ArchiveInspector> implements vscode.FileSystemProvider {
     public static readonly scheme: string;
     public static readonly mountCommand: string;
-    protected abstract readonly inspector: T;
+    protected inspectorMap: Map<string, T> = new Map();
 
     /**
      * Should simply be set to return a new instance of the derived class.
      */
     protected static readonly constructorWrapper: () => AbstractFsProvider<any>; // Would prefer to use a good return type, but `any` will do for now.
+    protected abstract newInspector(): T;
 
     protected abstract extractNested(archive: vscode.Uri, nested: vscode.Uri): vscode.Uri | Thenable<vscode.Uri>;
 
@@ -20,17 +21,26 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
 
     public stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
         log.trace(`stat: ${uri.toString()}`);
-        return this.inspector.stat(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
+        if (!this.inspectorMap.has(uri.query)) {
+            this.inspectorMap.set(uri.query, this.newInspector());
+        }
+        return this.inspectorMap.get(uri.query)!.stat(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
     }
 
     public readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
         log.trace(`readDirectory: ${uri.toString()}`);
-        return this.inspector.readDirectory(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
+        if (!this.inspectorMap.has(uri.query)) {
+            this.inspectorMap.set(uri.query, this.newInspector());
+        }
+        return this.inspectorMap.get(uri.query)!.readDirectory(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
     }
 
     public readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
         log.trace(`readFile: ${uri.toString()}`);
-        return this.inspector.readFile(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
+        if (!this.inspectorMap.has(uri.query)) {
+            this.inspectorMap.set(uri.query, this.newInspector());
+        }
+        return this.inspectorMap.get(uri.query)!.readFile(vscode.Uri.file(uri.query), vscode.Uri.file(uri.path));
     }
 
     public watch(_uri: vscode.Uri, _options: { readonly recursive: boolean; readonly excludes: readonly string[]; }): vscode.Disposable {
@@ -81,7 +91,7 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
             const name = vscode.workspace.asRelativePath(archive.fsPath, true);
             const index = vscode.workspace.workspaceFolders?.length ?? 0;
             const wpFolder: vscode.WorkspaceFolder = { uri, name, index };
-            WorkspaceFolderStore.getInstance().insert(wpFolder);
+            WorkspaceFolderUriStore.getInstance().insert(uri);
             vscode.workspace.updateWorkspaceFolders(index, 0, wpFolder);
         }
     }
@@ -123,26 +133,30 @@ export abstract class AbstractFsProvider<T extends ArchiveInspector> implements 
     }
 }
 
-export class WorkspaceFolderStore {
-    private static instance: WorkspaceFolderStore;
-    private workspaceFolders: vscode.WorkspaceFolder[] = [];
+export class WorkspaceFolderUriStore {
+    private static instance: WorkspaceFolderUriStore;
+    private workspaceFolderUris: vscode.Uri[] = [];
 
     private constructor() { }
 
-    public static getInstance(): WorkspaceFolderStore {
-        if (!WorkspaceFolderStore.instance) {
-            WorkspaceFolderStore.instance = new WorkspaceFolderStore();
+    public static getInstance(): WorkspaceFolderUriStore {
+        if (!WorkspaceFolderUriStore.instance) {
+            WorkspaceFolderUriStore.instance = new WorkspaceFolderUriStore();
         }
-        return WorkspaceFolderStore.instance;
+        return WorkspaceFolderUriStore.instance;
     }
 
-    public insert(folder: vscode.WorkspaceFolder): void {
-        this.workspaceFolders.push(folder);
+    public insert(folderUri: vscode.Uri): void {
+        this.workspaceFolderUris.push(folderUri);
     }
 
     public clean(): void {
-        this.workspaceFolders.forEach((folder) => {
-            vscode.workspace.updateWorkspaceFolders(folder.index, 1);
+        this.workspaceFolderUris.forEach((folderUri) => {
+            const wpFolder = vscode.workspace.getWorkspaceFolder(folderUri);
+            if (wpFolder === undefined) {
+                return;
+            }
+            vscode.workspace.updateWorkspaceFolders(wpFolder.index, 1);
         });
     }
 }

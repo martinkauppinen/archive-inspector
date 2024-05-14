@@ -1,6 +1,6 @@
 import * as log from './log';
 import * as vscode from 'vscode';
-import { TarFsProvider, WorkspaceFolderStore, ZipFsProvider } from './fs-providers';
+import { TarFsProvider, WorkspaceFolderUriStore, ZipFsProvider } from './fs-providers';
 import { cleanTempDir } from './util';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -11,5 +11,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
     cleanTempDir();
-    WorkspaceFolderStore.getInstance().clean();
+    WorkspaceFolderUriStore.getInstance().clean();
 }

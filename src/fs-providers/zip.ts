@@ -8,10 +8,13 @@ import * as log from '../log';
 import * as path from 'path';
 
 export class ZipFsProvider extends AbstractFsProvider<ZipInspector> {
-    protected inspector: ZipInspector = new ZipInspector();
     protected static readonly constructorWrapper = () => new ZipFsProvider();
     public static readonly scheme = this.buildScheme('zipfs');
     public static readonly mountCommand = this.buildMountCommand('zip');
+
+    protected newInspector(): ZipInspector {
+        return new ZipInspector();
+    }
 
     protected extractNested(archive: vscode.Uri, nested: vscode.Uri): Promise<vscode.Uri> {
         const outputUri = vscode.Uri.joinPath(vscode.Uri.file(makeTempDir()), nested.path);

@@ -6,11 +6,14 @@ import { execSync } from 'child_process';
 import { makeTempDir, tar } from '../util';
 
 export class TarFsProvider extends AbstractFsProvider<TarInspector> {
-    protected inspector: TarInspector = new TarInspector();
     protected static readonly constructorWrapper = () => new TarFsProvider();
     public static readonly scheme = this.buildScheme('tarfs');
     public static readonly mountCommand = this.buildMountCommand('tar');
     private hasGnuTar: boolean = false;
+
+    protected newInspector(): TarInspector {
+        return new TarInspector();
+    }
 
     protected extractNested(archive: vscode.Uri, nested: vscode.Uri): vscode.Uri {
         const outputUri = vscode.Uri.file(makeTempDir());

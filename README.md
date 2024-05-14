@@ -39,7 +39,6 @@ This extension contributes the following settings:
 ## Known Issues
 
 * Opening a tarball containing a directory called `.` sends the inspector into an infinite loop.
-* Mounting multiple archives of the same type only shows the latest archive in the explorer.
 
 ## Release Notes
 

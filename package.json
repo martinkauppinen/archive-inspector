@@ -3,7 +3,7 @@
   "displayName": "Archive Inspector",
   "publisher": "martinkauppinen",
   "description": "Mount archive files as workspace directories",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "engines": {
     "vscode": "^1.89.0"
   },

@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as constants from '../constants';
-import { TarInspector } from '../inspectors';
 import { AbstractFsProvider } from '.';
 import { execSync } from 'child_process';
 import { makeTempDir, tar } from '../util';
+import { TarInspector } from '../inspectors/tar';
 
 export class TarFsProvider extends AbstractFsProvider<TarInspector> {
     protected static readonly constructorWrapper = () => new TarFsProvider();

@@ -1,4 +1,3 @@
-import { ZipInspector } from '../inspectors';
 import { AbstractFsProvider } from '.';
 import * as vscode from 'vscode';
 import * as unzipper from 'unzipper';
@@ -6,6 +5,7 @@ import * as fs from 'fs';
 import { makeTempDir } from '../util';
 import * as log from '../log';
 import * as path from 'path';
+import { ZipInspector } from '../inspectors/zip';
 
 export class ZipFsProvider extends AbstractFsProvider<ZipInspector> {
     protected static readonly constructorWrapper = () => new ZipFsProvider();

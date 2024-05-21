@@ -1,7 +1,9 @@
 import * as log from './log';
 import * as vscode from 'vscode';
-import { TarFsProvider, WorkspaceFolderUriStore, ZipFsProvider } from './fs-providers';
+import { WorkspaceFolderUriStore } from './fs-providers';
 import { cleanTempDir } from './util';
+import { TarFsProvider } from './fs-providers/tar';
+import { ZipFsProvider } from './fs-providers/zip';
 
 export function activate(context: vscode.ExtensionContext) {
     log.init(context);

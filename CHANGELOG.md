@@ -1,8 +1,14 @@
 # Change Log
 
-All notable changes to the "archive-inspector" extension will be documented in this file.
+## [0.3.2]
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Fixed
+- Circular dependency caused by reexporting which in turn caused extension to fail to load.
+
+## [0.3.1]
+
+### Fixed
+- Shrink extension size by bundling.
 
 ## [0.3.0]
 

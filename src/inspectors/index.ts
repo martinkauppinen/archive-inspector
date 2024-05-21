@@ -5,6 +5,3 @@ export interface ArchiveInspector {
     readDirectory(archive: vscode.Uri, uri: vscode.Uri): [string, vscode.FileType][] | Promise<[string, vscode.FileType][]>;
     readFile(archive: vscode.Uri, uri: vscode.Uri): Uint8Array | Promise<Uint8Array>;
 }
-
-export * from './tar';
-export * from './zip';
